@@ -1,4 +1,4 @@
-# Data Analysis Assistant
+# sisyphus
 
 Interactive data analysis tool using Streamlit, Groq API, and web search capabilities.
 
