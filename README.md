@@ -1,15 +1,62 @@
-# sisyphus
+# Sisyphus - AI-Powered Data Analysis Assistant
 
-Interactive data analysis tool using Streamlit, Groq API, and web search capabilities.
+## Overview
+Sisyphus is a powerful data analysis tool that combines Streamlit's interactive interface with Groq's AI capabilities and web search integration. It allows users to analyze data from CSV files or Google Sheets while leveraging AI for insights.
 
-## Setup
+## Key Features
+🔄 Data Import
+- CSV file upload
+- Google Sheets integration
+- Data preview and statistics
 
-1. Clone repository:
+🤖 AI Analysis
+- Natural language queries
+- Web search integration
+- Contextual responses
+
+📊 Visualization
+- Interactive charts
+- Column selection
+- Data statistics
+
+## Quick Start
+
+### Local Setup
 ```bash
-git clone https://github.com/unworld11/sisyphus/edit/main/README.md
+# Clone repository
+git clone https://github.com/unworld11/sisyphus.git
+cd sisyphus
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate
+
+# Install dependencies
+pip install -r [requirements.txt](http://_vscodecontentref_/0)
 ```
 
-2. Create `.streamlit/secrets.toml` from template:
+### Environment Setup
+1. Create .env file :
+```bash
+    GROQ_API_KEY=your_groq_api_key
+    SERPAPI_KEY=your_serp_api_key
+```
+2. Setup Google Sheets (optional)
 ```bash
 cp .streamlit/secrets.toml.template .streamlit/secrets.toml
 ```
+
+### API Configuration
+1. Groq API
+    - Get API key from Groq
+    - Add to .env file
+
+2. SerpAPI
+    - Register at SerpAPI
+    - Add API key to .env
+
+3. Google Sheets
+    - Enable Google Sheets API in GCP Console
+    - Create Service Account
+    - Download credentials
+    - Add to secrets.toml
