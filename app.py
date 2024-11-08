@@ -128,6 +128,18 @@ def ask_about_data(client, question, df, stats, use_web_search):
             temperature=0.7,
             max_tokens=1024,
         )
+                # Store result in session state
+        new_result = pd.DataFrame({
+            'Question': [question],
+            'Answer': [completion.choices[0].message.content],
+            'Timestamp': [pd.Timestamp.now()]
+        })
+        
+        if 'results' not in st.session_state:
+            st.session_state.results = new_result
+        else:
+            st.session_state.results = pd.concat([st.session_state.results, new_result], ignore_index=True)
+            
         return completion.choices[0].message.content
     except Exception as e:
         st.error(f"Error: {str(e)}")
@@ -189,7 +201,43 @@ def main():
                     if answer:
                         st.success("Response generated!")
                         st.write("Answer:", answer)
-        
+        if 'results' not in st.session_state:
+            st.session_state.results = pd.DataFrame()
+
+        # Display results in table
+        st.subheader("Analysis Results")
+        if not st.session_state.results.empty:
+            st.dataframe(st.session_state.results)
+            
+            # Download CSV button
+            csv = st.session_state.results.to_csv(index=False)
+            st.download_button(
+                label="Download Results as CSV",
+                data=csv,
+                file_name="analysis_results.csv",
+                mime="text/csv"
+            )
+        # Google Sheets Update
+        if st.button("Update Google Sheet"):
+            try:
+                sheet_url = st.text_input("Enter Google Sheet URL to update:")
+                if sheet_url:
+                    with st.spinner("Updating Google Sheet..."):
+                        gc = setup_google_auth()
+                        if gc:
+                            sheet = gc.open_by_url(sheet_url)
+                            worksheet = sheet.get_worksheet(0)
+                            
+                            # Convert DataFrame to list of lists
+                            data = [st.session_state.results.columns.tolist()] + st.session_state.results.values.tolist()
+                            
+                            # Update sheet
+                            worksheet.clear()
+                            worksheet.update(data)
+                            st.success("Google Sheet updated successfully!")
+            except Exception as e:
+                st.error(f"Error updating Google Sheet: {str(e)}")
+            
 
 if __name__ == "__main__":
     main()
