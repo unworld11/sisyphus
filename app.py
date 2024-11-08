@@ -13,14 +13,18 @@ load_dotenv()
 
 @st.cache_resource
 def get_groq_client():
-    return Groq(api_key="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")
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        st.error("GROQ_API_KEY not found in environment variables")
+        st.stop()
+    return Groq(api_key=api_key)
 
 def web_search(query, num_results=3):
     """Perform web search using SerpAPI"""
     try:
         search = GoogleSearch({
             "q": query,
-            "api_key": "76d696738f4e3feaf9990d1342739d3c180a51fbc7ebff3bc0d304d699548282",
+            "api_key":  os.getenv("SERPAPI_KEY"),
             "num": num_results
         })
         results = search.get_dict()
