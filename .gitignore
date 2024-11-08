@@ -1,5 +1,5 @@
 .env
-.streamlit/
+*.toml
 __pycache__/
 *.pyc
 venv/
