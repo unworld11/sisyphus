@@ -138,7 +138,8 @@ def ask_about_data(client, question, df, stats, use_web_search):
         if 'results' not in st.session_state:
             st.session_state.results = new_result
         else:
-            st.session_state.results = pd.concat([st.session_state.results, new_result], ignore_index=True)
+            st.session_state.results = pd.concat
+            st.session_state.results, new_result, ignore_index=True
             
         return completion.choices[0].message.content
     except Exception as e:
