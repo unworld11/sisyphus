@@ -20,30 +20,44 @@ def get_groq_client():
     return Groq(api_key=api_key)
 
 def web_search(query, num_results=3):
-    """Perform web search using SerpAPI"""
+    """Perform web search using SerpAPI with debug output"""
     try:
+        api_key = os.getenv("SERPAPI_KEY")
+        if not api_key:
+            st.error("SERPAPI_KEY not found in environment variables")
+            return []
+            
+        st.info(f"Searching for: {query}")  # Debug info
+        
         search = GoogleSearch({
             "q": query,
-            "api_key":  os.getenv("SERPAPI_KEY"),
-            "num": num_results
+            "api_key": api_key,
+            "num": num_results,
+            "engine": "google"  # Explicitly set engine
         })
+        
         results = search.get_dict()
         
-        # Extract organic results
-        if "organic_results" in results:
-            search_results = []
-            for result in results["organic_results"][:num_results]:
-                search_results.append({
-                    "title": result.get("title", ""),
-                    "snippet": result.get("snippet", ""),
-                    "link": result.get("link", "")
-                })
-            return search_results
-        return []
+        if "organic_results" not in results:
+            st.warning("No organic results found in API response")
+            return []
+            
+        search_results = []
+        for result in results["organic_results"][:num_results]:
+            search_results.append({
+                "title": result.get("title", ""),
+                "snippet": result.get("snippet", ""),
+                "link": result.get("link", "")
+            })
+            
+        st.info(f"Found {len(search_results)} results")  # Debug info
+        st.write(search_results)  # Debug info
+        return search_results
+
+        
     except Exception as e:
         st.error(f"Search error: {str(e)}")
         return []
-
 
 def setup_google_auth():
     try:
@@ -92,17 +106,21 @@ def process_data(df):
     return df, stats
 
 
-def ask_about_data(client, question, df, stats, use_web_search=False):
+def ask_about_data(client, question, df, stats, use_web_search):
     try:
         system_context = f"""Analyzing a dataset with {stats['rows']} rows and columns: {', '.join(stats['columns'])}."""
         
         if use_web_search:
             with st.spinner('Searching web...'):
                 search_results = web_search(question)
-                system_context += f"\nWeb search results: {' '.join([r['snippet'] for r in search_results])}"
-        
+                if search_results:
+                    web_context = "\n".join([f"- {r['snippet']}" for r in search_results])
+                    system_context += f"\nWeb search results:\n{web_context}"
+                else:
+                    st.warning("No web search results found")
+
         completion = client.chat.completions.create(
-            model="llama2-70b-4096",
+            model="llama3-8b-8192",
             messages=[
                 {"role": "system", "content": system_context},
                 {"role": "user", "content": question}
