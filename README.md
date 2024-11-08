@@ -10,7 +10,7 @@ git clone https://github.com/unworld11/sisyphus/edit/main/README.md
 ```
 
 2. Secrets Setup
-1. Create `.streamlit/secrets.toml` from template:
+Create `.streamlit/secrets.toml` from template:
 ```bash
 cp .streamlit/secrets.toml.template .streamlit/secrets.toml
 ```
