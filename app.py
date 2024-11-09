@@ -118,7 +118,7 @@ def ask_about_data(client, question, df, stats, use_web_search):
                     system_context += f"\nWeb search results:\n{web_context}"
                 else:
                     st.warning("No web search results found")
-
+        
         completion = client.chat.completions.create(
             model="llama3-8b-8192",
             messages=[
@@ -128,7 +128,7 @@ def ask_about_data(client, question, df, stats, use_web_search):
             temperature=0.7,
             max_tokens=1024,
         )
-                # Store result in session state
+        
         new_result = pd.DataFrame({
             'Question': [question],
             'Answer': [completion.choices[0].message.content],
@@ -136,11 +136,10 @@ def ask_about_data(client, question, df, stats, use_web_search):
         })
         
         if 'results' not in st.session_state:
-            st.session_state.results = new_result
+            st.session_state['results'] = new_result
         else:
-            st.session_state.results = pd.concat
-            st.session_state.results, new_result, ignore_index=True
-            
+            st.session_state['results'] = pd.concat([st.session_state['results'], new_result], ignore_index=True)
+        
         return completion.choices[0].message.content
     except Exception as e:
         st.error(f"Error: {str(e)}")
@@ -193,33 +192,35 @@ def main():
         
         # Q&A Section
         st.subheader("Ask Questions About Your Data")
-        use_web_search = st.toggle("Include web search results in analysis")
-        question = st.text_input("Enter your question:")
-        if st.button("Ask"):
+        use_web_search = st.checkbox("Include web search results in analysis", key="web_search_toggle")
+        question = st.text_input("Enter your question:", key="question_input")
+        
+        if st.button("Ask", key="ask_button"):
             if question:
                 with st.spinner('Analyzing...'):
                     answer = ask_about_data(client, question, df, stats, use_web_search)
                     if answer:
                         st.success("Response generated!")
                         st.write("Answer:", answer)
+        
+        # Initialize results DataFrame in session state if not present
         if 'results' not in st.session_state:
-            st.session_state.results = pd.DataFrame()
-
+            st.session_state['results'] = pd.DataFrame()
+        
         # Display results in table
         st.subheader("Analysis Results")
-        if not st.session_state.results.empty:
-            st.dataframe(st.session_state.results)
+        if not st.session_state['results'].empty:
+            st.dataframe(st.session_state['results'])
             
             # Download CSV button
-            csv = st.session_state.results.to_csv(index=False)
+            csv = st.session_state['results'].to_csv(index=False)
             st.download_button(
                 label="Download Results as CSV",
                 data=csv,
                 file_name="analysis_results.csv",
-                mime="text/csv"
+                mime="text/csv",
+                key="download_button"
             )
-        
-            
-
 if __name__ == "__main__":
     main()
+            
