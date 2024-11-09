@@ -60,3 +60,12 @@ cp .streamlit/secrets.toml.template .streamlit/secrets.toml
     - Create Service Account
     - Download credentials
     - Add to secrets.toml
+
+## Project Demo
+
+Watch the project walkthrough: [Loom Video](https://www.loom.com/share/8159c85d39bd4e9d9d28abd4997317d5?sid=f82d052f-7b78-4202-ac68-e27b8bfec244)
+
+In this video, we cover:
+- The overall purpose of the project
+- Key features and how the dashboard works
+- Notable code implementations and challenges encountered
