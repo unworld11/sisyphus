@@ -218,26 +218,7 @@ def main():
                 file_name="analysis_results.csv",
                 mime="text/csv"
             )
-        # Google Sheets Update
-        if st.button("Update Google Sheet"):
-            try:
-                sheet_url = st.text_input("Enter Google Sheet URL to update:")
-                if sheet_url:
-                    with st.spinner("Updating Google Sheet..."):
-                        gc = setup_google_auth()
-                        if gc:
-                            sheet = gc.open_by_url(sheet_url)
-                            worksheet = sheet.get_worksheet(0)
-                            
-                            # Convert DataFrame to list of lists
-                            data = [st.session_state.results.columns.tolist()] + st.session_state.results.values.tolist()
-                            
-                            # Update sheet
-                            worksheet.clear()
-                            worksheet.update(data)
-                            st.success("Google Sheet updated successfully!")
-            except Exception as e:
-                st.error(f"Error updating Google Sheet: {str(e)}")
+        
             
 
 if __name__ == "__main__":
